@@ -8,6 +8,7 @@ import session from 'express-session';
 import passport from "passport";
 import User from "../models/user.js";
 import LocalStrategy from 'passport-local';
+import MongoStore from 'connect-mongo';
 
 import dotenv from "dotenv";
 dotenv.config();
@@ -29,11 +30,19 @@ app.use(cors({
 app.use(express.json());
 
 app.use(session({
-
-  secret:"my secret",
-  resave:false,
-  saveUninitialized:false
-}))
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGO_URL,
+    ttl: 14 * 24 * 60 * 60 // = 14 days
+  }),
+  cookie: {
+    secure: process.env.NODE_ENV === "production",
+    httpOnly: true,
+    maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days
+  }
+}));
 
 app.use(passport.initialize());
 app.use(passport.session());
