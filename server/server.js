@@ -24,7 +24,7 @@ async function main() {
   await mongoose.connect(MONGO_URL);
 }
 app.use(cors({
-  origin: true,
+  origin: "https://codifie.vercel.app",
   credentials: true
 }));
 app.use(express.json());
