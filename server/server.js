@@ -5,10 +5,10 @@ import fetchRoutes from "./routes/fetchStats.js";
 import cors from 'cors';
 import customError from "../utils/customError.js";
 import session from 'express-session';
+import MongoStore from 'connect-mongo';
 import passport from "passport";
 import User from "../models/user.js";
 import LocalStrategy from 'passport-local';
-import MongoStore from 'connect-mongo';
 
 import dotenv from "dotenv";
 dotenv.config();
@@ -29,24 +29,24 @@ app.use(cors({
 }));
 app.use(express.json());
 
+
+const store=MongoStore.create({
+  mongoUrl:MONGO_URL,
+  crypto:{
+    secret:"my secret",
+  },
+  touchAfter:24*3600,
+})
+store.on("error",()=>{
+  console.log("ERROR IN MONGO SESSION STORE",err);
+})
 app.use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: true,
-  store: MongoStore.create({
-    mongoUrl: process.env.MONGO_URL,
-    ttl: 14 * 24 * 60 * 60, // = 14 days
-    crypto:{
-      secret: process.env.SESSION_SECRET,
-    }
-  }),
-  cookie: {
-    secure: true,
-    httpOnly: true,
-    maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
-    sameSite:'none'
-  }
-}));
+  store,
+  secret:"my secret",
+  resave:false,
+  saveUninitialized:false,
+  cookie: { expires: new Date(Date.now() + 1000 * 60 * 60 * 24) }
+}))
 
 app.use(passport.initialize());
 app.use(passport.session());
