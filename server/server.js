@@ -45,7 +45,12 @@ app.use(session({
   secret:"my secret",
   resave:false,
   saveUninitialized:false,
-  cookie: { expires: new Date(Date.now() + 1000 * 60 * 60 * 24) }
+  cookie: {
+    maxAge: 1000 * 60 * 60 * 24,       // 1 day
+    sameSite: "none",                 // <— allow cross-site
+    secure: true,                     // <— only send over HTTPS
+    httpOnly: true                    // <— prevents JS access (recommended)
+  }
 }))
 
 app.use(passport.initialize());
