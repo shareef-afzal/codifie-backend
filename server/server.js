@@ -35,10 +35,13 @@ app.use(session({
   saveUninitialized: false,
   store: MongoStore.create({
     mongoUrl: process.env.MONGO_URL,
-    ttl: 14 * 24 * 60 * 60 // = 14 days
+    ttl: 14 * 24 * 60 * 60, // = 14 days
+    crypto:{
+      secret: process.env.SESSION_SECRET,
+    }
   }),
   cookie: {
-    secure: process.env.NODE_ENV === "production",
+    secure: true,
     httpOnly: true,
     maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
     sameSite:'none'
