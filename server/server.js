@@ -33,7 +33,7 @@ app.use(express.json());
 const store=MongoStore.create({
   mongoUrl:MONGO_URL,
   crypto:{
-    secret:"my secret",
+    secret:process.env.SESSION_SECRET,
   },
   touchAfter:24*3600,
 })
@@ -42,13 +42,13 @@ store.on("error",()=>{
 })
 app.use(session({
   store,
-  secret:"my secret",
+  secret:process.env.SESSION_SECRET,
   resave:false,
   saveUninitialized:false,
   cookie: {
     maxAge: 1000 * 60 * 60 * 24,       // 1 day
     sameSite: "none",                 // <— allow cross-site
-    secure: true,                     // <— only send over HTTPS
+    secure: process.env.NODE_ENV === 'production',                     // <— only send over HTTPS
     httpOnly: true                    // <— prevents JS access (recommended)
   }
 }))
