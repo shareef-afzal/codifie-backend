@@ -23,6 +23,7 @@ main()
 async function main() {
   await mongoose.connect(MONGO_URL);
 }
+app.set("trust proxy", 1);
 app.use(cors({
   origin: "https://codifie.vercel.app",
   credentials: true
